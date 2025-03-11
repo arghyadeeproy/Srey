@@ -63,7 +63,7 @@ const CRTScreen = () => {
 
       {/* Render Windows */}
       {openWindows.map((win) => (
-        <Draggable key={win} handle=".handle" defaultPosition={{ x: 35, y: 50 }}>
+        <Draggable key={win} handle=".handle" defaultPosition={{ x: 10, y: 10 }}>
           <div className="absolute">
             <Window title={win} onClose={() => toggleWindow(win)} />
           </div>
