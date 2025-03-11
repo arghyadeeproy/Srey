@@ -6,40 +6,45 @@ import CRTScreen from './components/CRTScren';
 
 export default function Home() {
   const [showCRT, setShowCRT] = useState(false);
-  const [isZooming, setIsZooming] = useState(false);
-  const [zoomingOut, setZoomingOut] = useState(false);
-  const [showButton, setShowButton] = useState(true);
+  const [showButton, setShowButton] = useState(false);
+  const zoomDuration = 1000; // Animation duration in ms
 
   const handleShowCRT = () => {
-    setIsZooming(true);
+    // First turn on CRT
     setTimeout(() => {
       setShowCRT(true);
+      
+      // Then show the power off button after zoom animation completes
+      setTimeout(() => {
+        setShowButton(true);
+      }, zoomDuration);
     }, 1000);
   };
 
   const handleHideCRT = () => {
+    // Hide button immediately when clicked
     setShowButton(false);
-    setZoomingOut(true);
+    
+    // Then turn off CRT after a delay
     setTimeout(() => {
       setShowCRT(false);
-      setIsZooming(false);
-      setZoomingOut(false);
-      setShowButton(true);
+      
+      // No need to set showButton to true here since it will only be shown
+      // after CRT is turned on and zoom animation completes
     }, 1000);
   };
 
   // Debug log to check states
   useEffect(() => {
     console.log('CRT is ' + (showCRT ? 'on' : 'off'));
-  }, [showCRT]);
+    console.log('Button is ' + (showButton ? 'visible' : 'hidden'));
+  }, [showCRT, showButton]);
 
   return (
     <div className="fixed inset-0 overflow-hidden">
       {/* Main content with background */}
       <main
-        className={`flex min-h-screen w-full flex-col items-center justify-center transition-all duration-1000 ease-in-out ${
-          isZooming && !zoomingOut ? 'scale-125' : 'scale-100'
-        }`}
+        className="flex min-h-screen w-full flex-col items-center justify-center transition-all duration-1000 ease-in-out"
         style={{
           backgroundImage: 'url(/scene2-d14f31-compressed-da7d54.jpg)',
           backgroundSize: 'cover',
@@ -49,6 +54,7 @@ export default function Home() {
           backgroundAttachment: 'fixed',
           transformOrigin: 'center center',
           position: 'relative',
+          transform: showCRT ? 'scale(1.8)' : 'scale(1)', // Add zoom effect
         }}
       >
         {/* CRT Screen - Only visible when CRT is on */}
@@ -65,6 +71,12 @@ export default function Home() {
           <div
             className="absolute cursor-pointer power-on-button"
             onClick={handleShowCRT}
+            style={{
+              position: 'absolute',
+              zIndex: 10,
+              marginTop: '340px',
+              marginLeft: '185px',
+            }}
           >
             <Image
               src="/crop-off-d1fca7.jpg"
@@ -78,7 +90,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* Power Off Button - Only visible when CRT is on AND button is not hidden during transition */}
+      {/* Power Off Button - Only visible when CRT is on AND button visibility is set to true */}
       {showCRT && showButton && (
         <div
           onClick={handleHideCRT}
@@ -87,9 +99,9 @@ export default function Home() {
           <Image
             src="/crop-on-e8511a.jpg"
             alt="Power Off CRT"
-            width={95}
-            height={41}
-            className="w-auto h-auto"
+            width={100}
+            height={150}
+            className="transparent-button"
             priority
           />
         </div>
@@ -99,7 +111,7 @@ export default function Home() {
       <style jsx global>{`
         /* CRT monitor wrapper - positions the screen in the monitor */
         .crt-monitor-wrapper {
-          position: absolute;
+          position: fixed;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -133,8 +145,25 @@ export default function Home() {
           position: fixed;
           z-index: 20;
           /* Base positioning for larger screens */
-          bottom: calc(50% - 225px);
-          right: calc(50% - 150px);
+          bottom: calc(50% - 330px);
+          right: calc(50% - 230px);
+          /* Add fade-in animation */
+          animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Make the button transparent */
+        .transparent-button {
+          opacity: 0; /* 50% transparent - adjust value between 0-1 as needed */
+          transition: opacity 0s ease; /* Smooth transition for hover effect */
+        }
+        
+        .transparent-button:hover {
+          opacity: 0; /* More visible on hover for better UX */
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 0; } /* Match the transparency level */
         }
 
         /* Responsive adjustments */
